@@ -1,12 +1,36 @@
-cmake_minimum_required(VERSION 2.8.3)
+cmake_minimum_required(VERSION 2.8)
 project(irll_search_rescue)
+
+find_package(catkin REQUIRED)
+catkin_package()
+
+#catkin_python_setup()
+
+
+install(PROGRAMS src/drone_controller.py  
+		 src/drone_status.py  
+		 src/drone_video_display.py  
+		 src/joystick_controller.py  
+		 src/keyboard_controller.py
+		 src/image_converter.py
+        DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
+)
+
+install(DIRECTORY launch/
+  DESTINATION ${CATKIN_PACKAGE_SHARE_DESTINATION}/launch
+)
+
+
+############################################
 
 ## Find catkin macros and libraries
 ## if COMPONENTS list like find_package(catkin REQUIRED COMPONENTS xyz)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
+  cv_bridge
+  image_transport
   roscpp
-  rospy
+  sensor_msgs
   std_msgs
 )
 
@@ -67,7 +91,7 @@ find_package(catkin REQUIRED COMPONENTS
 ## Generate added messages and services with any dependencies listed here
 # generate_messages(
 #   DEPENDENCIES
-#   std_msgs
+#   sensor_msgs#   std_msgs
 # )
 
 ###################################
@@ -81,8 +105,8 @@ find_package(catkin REQUIRED COMPONENTS
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
 #  INCLUDE_DIRS include
-#  LIBRARIES irll_search_rescue
-#  CATKIN_DEPENDS roscpp rospy std_msgs
+#  LIBRARIES kinect2
+#  CATKIN_DEPENDS cv_bridge image_transport roscpp sensor_msgs std_msgs
 #  DEPENDS system_lib
 )
 
@@ -93,26 +117,29 @@ catkin_package(
 ## Specify additional locations of header files
 ## Your package locations should be listed before other locations
 # include_directories(include)
-include_directories(
+include_directories(include
   ${catkin_INCLUDE_DIRS}
 )
 
 ## Declare a cpp library
-# add_library(irll_search_rescue
-#   src/${PROJECT_NAME}/irll_search_rescue.cpp
+# add_library(kinect2
+#   src/${PROJECT_NAME}/kinect2.cpp
 # )
 
 ## Declare a cpp executable
-# add_executable(irll_search_rescue_node src/irll_search_rescue_node.cpp)
+#add_executable(Depth src/depth.cpp)
 
 ## Add cmake target dependencies of the executable/library
 ## as an example, message headers may need to be generated before nodes
-# add_dependencies(irll_search_rescue_node irll_search_rescue_generate_messages_cpp)
+#add_dependencies(kinect2_node kinect2_generate_messages_cpp)
 
 ## Specify libraries to link a library or executable target against
-# target_link_libraries(irll_search_rescue_node
+# target_link_libraries(kinect2_node
 #   ${catkin_LIBRARIES}
 # )
+
+#add_executable(test_API src/test.cpp src/movement.cpp src/sensors.cpp)
+#target_link_libraries(test_API ${catkin_LIBRARIES})
 
 #############
 ## Install ##
@@ -129,7 +156,7 @@ include_directories(
 # )
 
 ## Mark executables and/or libraries for installation
-# install(TARGETS irll_search_rescue irll_search_rescue_node
+# install(TARGETS kinect2 kinect2_node
 #   ARCHIVE DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   LIBRARY DESTINATION ${CATKIN_PACKAGE_LIB_DESTINATION}
 #   RUNTIME DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
@@ -154,10 +181,11 @@ include_directories(
 #############
 
 ## Add gtest based cpp test target and link libraries
-# catkin_add_gtest(${PROJECT_NAME}-test test/test_irll_search_rescue.cpp)
+# catkin_add_gtest(${PROJECT_NAME}-test test/test_kinect2.cpp)
 # if(TARGET ${PROJECT_NAME}-test)
 #   target_link_libraries(${PROJECT_NAME}-test ${PROJECT_NAME})
 # endif()
 
 ## Add folders to be run by python nosetests
 # catkin_add_nosetests(test)
+
