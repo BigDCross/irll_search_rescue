@@ -53,8 +53,10 @@ class ARDroneController():
     self.init_copter_x_position = 999
     self.init_copter_y_position = 999
 
-    self.subPoseData = rospy.Subscriber('/gazebo/model_states', ModelStates, 
-        self.ReceiveModelStates)
+    #self.status_pub = rospy.Publisher('/mission/status', String)
+
+    #self.subPoseData = rospy.Subscriber('/gazebo/model_states', ModelStates, 
+    #    self.ReceiveModelStates)
 
   def Takeoff(self):
     self.controller.SendTakeoff()
@@ -155,31 +157,39 @@ class ARDroneController():
     print "Returning Home!"
 
        #while (self.copter_x_position >= 2) or (self.copter_x_position <= -2):
-    if self.copter_y_position > 2:
-      self.Right(1)
-      time.sleep(1)
-      self.Stop()	  
-      time.sleep(1)
-    elif self.copter_y_position < -2: 
-      self.Left(1)
-      time.sleep(1)	  
-      self.Stop()	  
-      time.sleep(1)
-    else:
-      self.Stop()
-      controller.Land()
+    #if self.copter_y_position > 2:
+     # self.Right(1)
+      #time.sleep(1)
+      #self.Stop()	  
+      #time.sleep(1)
+    #elif self.copter_y_position < -2: 
+    #  self.Left(1)
+    #  time.sleep(1)	  
+    #  self.Stop()	  
+    #  time.sleep(1)
+    #else:
+    str = "GO"
+    self.status_pub.publish(str)
+    self.Left(1)
+    self.Left(1)
+    self.Left(1)
+    self.Stop()
+    controller.Land()
 
   def ReceiveModelStates(self, model_states):
+    a = model_states.name.index ("quadrotor")
+    c = model_states.name.index ("unit_cylinder_2")
+    
     if self.init_copter_x_position == 999:
-      self.init_copter_x_position = int(model_states.pose[3].position.x)
-      self.init_copter_y_position = int(model_states.pose[3].position.y)
+      self.init_copter_x_position = int(model_states.pose[a].position.x)
+      self.init_copter_y_position = int(model_states.pose[a].position.y)
       print "Initial State Recorded."
 
     print "hi!"
-    self.copter_x_position = int(model_states.pose[3].position.x)
-    self.copter_y_position = int(model_states.pose[3].position.y)
-    self.target_x_position = int(model_states.pose[1].position.x)
-    self.target_y_position = int(model_states.pose[1].position.y)
+    self.copter_x_position = int(model_states.pose[a].position.x)
+    self.copter_y_position = int(model_states.pose[a].position.y)
+    self.target_x_position = int(model_states.pose[c].position.x)
+    self.target_y_position = int(model_states.pose[c].position.y)
 
     if (self.copter_x_position <= self.target_x_position + .5 and self.copter_x_position >= self.target_x_position - .5) and (self.copter_y_position <= self.target_y_position + .5 and self.copter_y_position >= self.target_y_position - .5):
 	print "You Have Located the Target!"
@@ -523,8 +533,9 @@ if __name__=='__main__':
   time.sleep(4)
   controller = ARDroneController()
   controller.Takeoff()
-  time.sleep(3)
- 
+  time.sleep(2)
+  controller.Stop()
+  time.sleep(1) 
   while 1:
       if not controller.found:	  
         controller.Forward(1)
@@ -554,6 +565,7 @@ if __name__=='__main__':
   
       if controller.found:
         print "Done"
+	
         controller.ReturnHome()
 	#break	  
 

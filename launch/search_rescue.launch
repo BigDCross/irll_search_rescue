@@ -1,5 +1,5 @@
 <launch>
-  <node pkg="irll_search_rescue" type="irll_search_rescue" name="irll_search_rescue"  output="screen">
+  <node pkg="irll_search_rescue" type="irll_search_rescue" name="search_rescue"  output="screen">
     <remap from="turtlebot_teleop_keyboard/cmd_vel" to="cmd_vel_mux/input/teleop"/>
   </node>
 </launch>
