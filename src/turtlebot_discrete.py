@@ -1,9 +1,7 @@
 #!/usr/bin/env python
-
 import roslib
 #roslib.load_manifest('')
 import rospy
-
 from geometry_msgs.msg import Twist
 from gazebo_msgs.msg import ModelStates
 
@@ -13,14 +11,16 @@ import sys, select, termios, tty
 from math import atan2, pi
 from time import sleep
 
+import grid
+
 class SearchAndRescue ():
     def __init__(self):
         self.x = 0
 
 	self.turtlebot_position = None
 	self.last_turtlebot_position = None
-        rospy.init_node('irll_search_rescue')
         self.pub = rospy.Publisher('/mobile_base/commands/velocity', Twist)
+        rospy.init_node('irll_search_rescue')
         rospy.Subscriber('/gazebo/model_states', ModelStates, self.saveModelStates)
         rospy.Subscriber('/mission/status', String, self.status)	
 	self.status = 1
@@ -67,7 +67,7 @@ class SearchAndRescue ():
 
     def saveModelStates (self, model_states):
         m = model_states.name.index ("mobile_base")
-        c = model_states.name.index ("unit_cylinder_1")
+        c = model_states.name.index ("unit_cylinder_2")
 	
 	if self.turtlebot_position != None:
 	    self.last_turtlebot_position = self.turtlebot_position
@@ -146,6 +146,34 @@ class SearchAndRescue ():
 
         self.publishDrive (twist)
 
+class Discrete_Movement ():
+    def __init__(self):
+        rospy.init_node('discrete_movement')
+        rospy.Subscriber('/gazebo/model_states', ModelStates, self.saveModelStates)
+	self.max_speed = 3.0
+	self.cell_spacing = 3.0
+
+    def saveModelStates (self, model_states):
+        m = model_states.name.index ("mobile_base")
+        c = model_states.name.index ("unit_cylinder_2")
+	
+        self.cylinder_position = model_states.pose[c].position
+        self.turtlebot_position = model_states.pose[m].position
+        self.cylinder_orientation = model_states.pose[c].orientation
+        self.turtlebot_orientation = model_states.pose[m].orientation
+
+    def move_forward(self, spaces):
+	#Move in a quadratic motion
+	#As distance increases speed increases
+	#until you reach half way
+	distance = self.cell_spacing * spaces
+	destination1 = self.pos_x + distance
+	destination2 = self.pos_y + distance
+	while not self.pos_x != destination1 or not self.pos_y != destination:
+	    speed = -(self.pos_x - .5(distance))**2
+	
+
 
 if __name__=="__main__":
-    sar = SearchAndRescue ()
+#    sar = SearchAndRescue ()
+     print "hi"
