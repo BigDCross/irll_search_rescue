@@ -75,6 +75,8 @@ class TurtlebotDiscreteRotation:
         #print self.turtlebot_orientation.w
         print "Yaw: ",
         print self.yaw
+        print "Compass: ",
+        print self.compass
         print "--------------------"
 
     def saveModelStates (self, model_states):
@@ -93,6 +95,9 @@ class TurtlebotDiscreteRotation:
 
         self.checkRotation ()
         self.printModelStates ()
+
+    def getDirection (self):
+        return self.compass
 
 turtlebot = TurtlebotDiscreteRotation ()
 
