@@ -1,0 +1,4 @@
+<launch>
+  <node pkg="irll_search_rescue" type="discrete_rotation" name="turtlebot_discrete_rotation"  output="screen">
+  </node>
+</launch>
