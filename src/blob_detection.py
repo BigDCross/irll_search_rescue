@@ -36,6 +36,7 @@ class Vision_Processor ():
                 print area,
                 print " ",
                 print moment
+        return 0
 
     def show_images (self):
         if self.outputted_images:
