@@ -21,7 +21,7 @@ import rospy
 from sensor_msgs.msg import Image 	# for receiving the video feed
 import cv2
 import numpy as np
-import tum_ardrone
+#import tum_ardrone
 from std_msgs.msg import String
 #from tum_ardrone import filter_state
 import os
@@ -31,15 +31,15 @@ from image_converter import ToOpenCV
 
 class ARsearch () :
   def __init__ (self):
-    #self.confirmed_target = 0
+    self.confirmed_target = 0
     self.status = 0
-    #self.currentState = (0,0,0,0)
-    #self.targetCoordinates = (0,0,0,0)
+    self.currentState = (0,0,0,0)
+    self.targetCoordinates = (0,0,0,0)
     rospy.init_node('ARsearch', anonymous=True)
-    #self.vision = Vision_Processor ()
+    self.vision = Vision_Processor ()
     self.autoPub = rospy.Publisher('/tum_ardrone/com', String)
-    #self.targetPub = rospy.Publisher('/ardrone/targetCoordinates', String)
-    #self.subVideo = rospy.Subscriber('/ardrone/image_raw', Image, self.find_target)
+    self.targetPub = rospy.Publisher('/ardrone/targetCoordinates', String)
+    self.subVideo = rospy.Subscriber('/ardrone/image_raw', Image, self.find_target)
     #self.relPosition = rospy.Subscriber('/ardrone/predictedPose', filter_state, self.get_state)
 
   #Moves the Ardrone to the given coordinates relative to where it has taken off
@@ -62,14 +62,18 @@ class ARsearch () :
   #Detects the red puck used as our tempory target
   def find_target(self, image):
     image_cv = ToOpenCV(image)
-    if self.vision.process_image(image_cv):
+    frame = np.asarray(image_cv)
+    cv2.imshow("Window1", frame)
+    #print "Image Received!"
+    cv2.waitKey(25)
+    if self.vision.process_image(frame):
       self.go_to(self.currentState[0], self.currentState[1], self.currentState[2], self.currentState[3])
       self.confirmed_target += 1
     else:
       self.confirmed_target -= 1
       if self.confirmed_target < 0:
 	self.confirmed_target = 0
-        self.fly_grid()
+        #self.fly_grid()
     if self.confirmed_target > 200:
       self.status = 1
       self.targetCoordinates = self.currentState
