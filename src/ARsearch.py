@@ -65,9 +65,7 @@ class ARsearch () :
       self.cameraIndex = 0
       image_cv = ToOpenCV(image)
       frame = np.asarray(image_cv)
-      cv2.imshow("Window1", frame)
       #print "Image Received!"
-      cv2.waitKey(25)
 
       if self.vision.process_image(frame):
         self.go_to(self.currentState[0], self.currentState[1], self.currentState[2], self.currentState[3])
@@ -88,11 +86,14 @@ class ARsearch () :
 	self.autoPub.publish("c clearCommands")
         self.go_to (0,0,0,0)
         self.autoPub.publish("c land")
-
+        self.autoPub.publish("c land")
+        self.autoPub.publish("c land")
     else:
       self.cameraIndex = 1
 
     self.toggle_cam(self.cameraIndex)
+    self.vision.show_images()
+    cv2.waitKey(25)
 
   #Flys in a set grid pattern until the target is found
   def fly_grid(self):
@@ -122,18 +123,30 @@ class ARsearch () :
     self.subVideo = rospy.Subscriber('/ardrone/image_raw', Image, self.find_target)
 
     while (self.status == 0):
-      self.autoPub.publish("c goto -0.5 -0.5 0 0")
-      self.autoPub.publish("c goto -0.5 0.5 0 0")
-      self.autoPub.publish("c goto -0.3 0.5 0 0")
-      self.autoPub.publish("c goto -0.3 -0.5 0 0")
-      self.autoPub.publish("c goto -0.1 -0.5 0 0")
-      self.autoPub.publish("c goto -0.1 0.5 0 0")
-      self.autoPub.publish("c goto 0.1 0.5 0 0")
-      self.autoPub.publish("c goto 0.1 -0.5 0 0")
-      self.autoPub.publish("c goto 0.3 -0.5 0 0")
-      self.autoPub.publish("c goto 0.3 0.5 0 0")
-      self.autoPub.publish("c goto 0.5 0.5 0 0")
-      self.autoPub.publish("c goto 0.5 -0.5 0 0")
+      self.autoPub.publish("c goto 0.0 0.0 0 0")
+
+      time.sleep(3)
+      self.autoPub.publish("c goto 0.0 -0.5 0 0")
+      time.sleep(3)
+      self.autoPub.publish("c goto -0.2 -0.5 0 0")
+      time.sleep(3)
+      self.autoPub.publish("c goto -0.2 0.0 0 0")
+      time.sleep(3)
+      self.autoPub.publish("c goto -0.4 0.0 0 0")
+      time.sleep(3)
+      self.autoPub.publish("c goto -0.4 -0.5 0 0")
+      time.sleep(3)
+      self.autoPub.publish("c goto -0.6 -0.5 0 0")
+      time.sleep(3)
+      self.autoPub.publish("c goto -0.6 0.0 0 0")
+      time.sleep(3)
+      self.autoPub.publish("c goto -0.6 0.0 0 0")
+      time.sleep(3)
+      self.autoPub.publish("c goto -0.6 -0.5 0 0")
+      time.sleep(3)
+      self.autoPub.publish("c goto -0.8 -0.5 0 0")
+      time.sleep(3)
+      self.autoPub.publish("c goto -0.0 0.0 0 0")
       time.sleep(100)
   
   
