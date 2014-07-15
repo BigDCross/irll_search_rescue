@@ -1,5 +1,7 @@
 #!/usr/bin/env python
 
+#TODO FIX LEFT
+
 import roslib
 #roslib.load_manifest('')
 import rospy
@@ -57,7 +59,7 @@ class SearchAndRescue ():
         self.turtlebot_position = model_states.pose[m].position
         self.turtlebot_orientation = model_states.pose[m].orientation
 	if self.target_position == None:
-	   self.target_position = (self.turtlebot_position.x, self.turtlebot_position.y, 0)
+	   self.target_position = (0, 0, 0)
 
 	#From Dustin
 	
@@ -78,6 +80,8 @@ class SearchAndRescue ():
  
     def set_destination(self,x,y):
 	z = 0
+        while not self.arrived:
+          sleep(1)
  	self.target_position = (x,y,z)
 
     #from Dustin
@@ -176,21 +180,25 @@ class SearchAndRescue ():
 	      #if you're to the left of the puck, turn right
  	      if self.turtlebot_position.x > self.target_position[0] or self.turtlebot_position.y > self.target_position[1]:
                 linear_twist.angular.z = -.1 * self.speed
- 	        linear_twist.linear.x = .05 * self.speed	
+ 	        linear_twist.linear.x = .05 * self.speed
+		print "Turning Right!"	
 	      else:
+		print "Turning Left!"	
 	        #else, turn left
-                linear_twist.angular.z = .1 * self.speed
+                #linear_twist.angular.z = .1 * self.speed
  	        linear_twist.linear.x = .05 * self.speed	
 	  #else go straight
 	  else:
 	      linear_twist.angular.z = 0
 	      linear_twist.linear.x = .05 * self.speed
+
+          self.publishDrive (linear_twist)
+
 	else:
 	  self.arrived = 1
 
-	  print "Current Position =  X: " + str(self.turtlebot_position.x) + " Y: " + str(self.turtlebot_position.y)
-	  print "Target Position = X: " + str(self.target_position[0]) + " Y: " + str(self.target_position[1])
-          self.publishDrive (linear_twist)
+	#print "Current Position =  X: " + str(self.turtlebot_position.x) + " Y: " + str(self.turtlebot_position.y)
+	#print "Target Position = X: " + str(self.target_position[0]) + " Y: " + str(self.target_position[1])
 
 
 if __name__=="__main__":
@@ -198,13 +206,29 @@ if __name__=="__main__":
     sleep(2)
     #sar.forward()
     print "1"
-    sar.rotate90Right()
-    sar.forward()
-    #sar.rotate90Left()
+    #sar.rotate90Right()
     #sar.forward()
     #sar.rotate90Left()
+    #sleep(10)
     #sar.forward()
+    #sar.rotate90Left()
+    #sleep(10)
     #sar.forward()
+    #sleep(15)
+    #sar.rotate90Left()
+    #sleep(10)
+    #sar.forward()
+    #sleep(15)
+    #sar.rotate90Left()
+    #sleep(10)
+    #sar.forward()
+    sar.rotate90Left()
+    sleep(10)
+    sar.rotate90Left()
+    sleep(10)
+
+
+    #sar.rotate90Left() sar.forward() sar.forward()
     print "3"
     #sar.rotate90Left()
     print "4"
