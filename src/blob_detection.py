@@ -20,7 +20,7 @@ class Vision_Processor ():
 
         self.images["HSV"] = cv2.cvtColor (self.images["MFilter"], cv2.COLOR_BGR2HSV)
 
-        self.images["Color_Filter"] = cv2.inRange (self.images["HSV"], (50, 50, 50), (100, 230, 230))
+        self.images["Color_Filter"] = cv2.inRange (self.images["HSV"], (160, 50, 50), (180, 230, 230))
 
         self.outputs["Contours"], heirarchy = cv2.findContours (deepcopy (self.images["Color_Filter"]), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -36,6 +36,7 @@ class Vision_Processor ():
                 print area,
                 print " ",
                 print moment
+		return 1
         return 0
 
     def show_images (self):

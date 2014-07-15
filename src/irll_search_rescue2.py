@@ -14,18 +14,34 @@ from math import atan2, pi
 from time import sleep
 import math
 
+#From Dustin
+
+import transformations as tf
+
+#----------
+
 class SearchAndRescue ():
     def __init__(self):
+
+	#From Lorin
+	self.arrived = 1
         self.x = 0
-
-
-	self.cell_length = 1
+	self.speed = 1
+	self.cell_length = .5
 	self.target_position = None
 	self.turtlebot_position = None
 	self.last_turtlebot_position = None
-        rospy.init_node('irll_search_rescue')
+        rospy.init_node('turtle_discrete_movement')
         self.pub = rospy.Publisher('/mobile_base/commands/velocity', Twist)
         rospy.Subscriber('/gazebo/model_states', ModelStates, self.saveModelStates)
+
+	#From Dustin
+        self.desired_orientation = 0.0
+        self.success = 0
+        #self.P = 0.4
+        self.P = 0.0
+        self.yaw = 0.0
+
 
     def publishDrive (self, twist):
         self.pub.publish(twist)
@@ -43,100 +59,155 @@ class SearchAndRescue ():
 	if self.target_position == None:
 	   self.target_position = (self.turtlebot_position.x, self.turtlebot_position.y, 0)
 
-        self.test ()
+	#From Dustin
+	
+	self.euler_angles = tf.euler_from_quaternion([self.turtlebot_orientation.w, self.turtlebot_orientation.x, self.turtlebot_orientation.y, self.turtlebot_orientation.z])
+
+        self.yaw = pi - (self.euler_angles[0] + pi)
+        self.compass = ((self.yaw - pi/4) // (pi / 2))
+
+        if self.compass == -1.0:
+            self.compass = 3.0
+
+        self.checkRotation ()
+        self.printModelStates ()
+
+	#----------
+
+        self.update_movement ()
  
     def set_destination(self,x,y):
 	z = 0
-	self.target_position = (x,y,z)
-	sleep(8)
+ 	self.target_position = (x,y,z)
 
     #from Dustin
-    def get_direction(self):
-	return 0
+    def get_direction (self):
+        return self.compass
+	#return 0
+
+    def rotate90Right (self):
+        self.P = 0.4
+        if self.desired_orientation == -pi: self.desired_orientation = -pi/2
+        elif self.desired_orientation == -pi/2: self.desired_orientation = 0.0
+        elif self.desired_orientation == 0.0: self.desired_orientation = pi/2
+        elif self.desired_orientation == pi/2: self.desired_orientation = -pi
+        sleep(13)
+
+    def rotate90Left (self):
+        self.P = 0.4
+        if self.desired_orientation == -pi: self.desired_orientation = pi/2
+        elif self.desired_orientation == pi/2: self.desired_orientation = 0.0
+        elif self.desired_orientation == 0.0: self.desired_orientation = -pi/2
+        elif self.desired_orientation == -pi/2: self.desired_orientation = -pi
+        sleep(13)
+
+    def checkRotation (self):
+        #print "Desired Orientation: ",
+        #print self.desired_orientation
+        error = self.desired_orientation - self.yaw
+        #print "Error: ",
+        #print abs (error)
+
+        twist = Twist ()
+
+        #print "Success: ",
+        #print self.success
+        if abs (error) > 0.2:
+            #print "Correcting!"
+            twist.angular.z = self.P * error
+            self.publishDrive (twist)
+            self.success = 0
+        else:
+            self.success = 1
+
+    def printModelStates (self):
+	'''
+        print "Yaw: ",
+        print self.yaw
+        print "Compass: ",
+        print self.compass
+        print "--------------------"
+	'''
+	pass
+     
+    #--------
+
 
     def forward(self):
 	self.speed = 1
-	if self.get_direction() == 0:
+	if self.get_direction() == 1.0 or self.get_direction() == -3.0:
+	   for z in range(1000):
+	       print "Moving forward in the x direction"
 	   x = self.target_position[0] + self.cell_length
            x = math.ceil(x)
-	   y = self.turtlebot_position.y
-	elif self.get_direction() == 1:
+	   y = math.ceil(self.target_position[1])
+	elif self.get_direction() == -2.0:
+	   for z in range(1000):
+	       print "Moving forward in the y direction"
 	   y = self.target_position[1] + self.cell_length
-	   x = self.turtlebot_position.x
+	   x = math.ceil(self.target_position[0])
            y = math.ceil(y)
-	elif self.get_direction() == 2:
+	elif self.get_direction() == 3.0:
+	   for z in range(1000):
+	       print "Moving backwards in the x direction"
 	   x = self.target_position[0] - self.cell_length
-	   y = self.turtlebot_position.y
-           x = math.ceil(x)
-	else:
+	   y = math.floor(self.target_position[1])
+           x = math.floor(x)
+	elif self.get_direction() == 0.0:
+	   for z in range(1000):
+	       print "Moving backwards in the y direction"
 	   y = self.target_position[1] - self.cell_length
-	   x = self.turtlebot_position.x
-           y = math.ceil(y)
-		
-	self.set_destination(x,y)
-
-    def backwards(self):
-	self.speed = -1
-	if self.get_direction() == 2:
-	   x = self.target_position[0] + self.cell_length
-           x = math.ceil(x)
-	   y = self.turtlebot_position.y
-	elif self.get_direction() == 3:
-	   y = self.target_position[1] + self.cell_length
-	   x = self.turtlebot_position.x
-           y = math.ceil(y)
-	elif self.get_direction() == 0:
-	   x = self.target_position[0] - self.cell_length
-	   y = self.turtlebot_position.y
-           x = math.ceil(x)
-	else:
-	   y = self.target_position[1] - self.cell_length
-	   x = self.turtlebot_position.x
-           y = math.ceil(y)
-		
-	self.set_destination(x,y)
+	   x = math.floor(self.target_position[0])
+           y = math.floor(y)
 	
-			
-    def rotate_right(self):
-	print "Rotate"
+	self.set_destination(x,y)
 
-    def rotate_left(self):
-	print "Rotate"
-
-    def test (self):
-	print "banana"
-        twist = Twist ()
+    def update_movement (self):
+	#print "banana"
+	linear_twist = Twist ()
         #print self.turtlebot_orientation
         #print
 	
 	#If the turtlebot and the puck are not in the same place
-	if abs(self.turtlebot_position.x - self.target_position[0]) >= .3 or abs(self.turtlebot_position.y - self.target_position[1]) >= .3:
+	if abs(self.turtlebot_position.x - self.target_position[0]) >= .1 or abs(self.turtlebot_position.y - self.target_position[1]) >= .1:
+	  self.arrived = 0
 	  #if we aren't getting closer turn left
 	  if abs(self.turtlebot_position.x - self.target_position[0]) >= abs(self.last_turtlebot_position.x - self.target_position[0]) or abs(self.turtlebot_position.y - self.target_position[1]) >= abs(self.last_turtlebot_position.y - self.target_position[1]):
 	      #if you're to the left of the puck, turn right
  	      if self.turtlebot_position.x > self.target_position[0] or self.turtlebot_position.y > self.target_position[1]:
-                twist.angular.z = -.1 * self.speed
- 	        twist.linear.x = .2 * self.speed	
+                linear_twist.angular.z = -.1 * self.speed
+ 	        linear_twist.linear.x = .05 * self.speed	
 	      else:
 	        #else, turn left
-                twist.angular.z = .1 * self.speed
- 	        twist.linear.x = .2 * self.speed	
+                linear_twist.angular.z = .1 * self.speed
+ 	        linear_twist.linear.x = .05 * self.speed	
 	  #else go straight
 	  else:
-	      twist.angular.z = 0
-	      twist.linear.x = .2 * self.speed
+	      linear_twist.angular.z = 0
+	      linear_twist.linear.x = .05 * self.speed
+	else:
+	  self.arrived = 1
 
-          self.publishDrive (twist)
+	  print "Current Position =  X: " + str(self.turtlebot_position.x) + " Y: " + str(self.turtlebot_position.y)
+	  print "Target Position = X: " + str(self.target_position[0]) + " Y: " + str(self.target_position[1])
+          self.publishDrive (linear_twist)
 
 
 if __name__=="__main__":
     sar = SearchAndRescue ()
     sleep(2)
+    #sar.forward()
+    print "1"
+    sar.rotate90Right()
     sar.forward()
-    sar.forward()
-    sar.forward()
-    sar.forward()
-    #rospy.spin()        
-    while 1:
-	#print "hi"
-	pass
+    #sar.rotate90Left()
+    #sar.forward()
+    #sar.rotate90Left()
+    #sar.forward()
+    #sar.forward()
+    print "3"
+    #sar.rotate90Left()
+    print "4"
+    #sar.forward()
+
+    rospy.spin()        
