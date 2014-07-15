@@ -31,6 +31,7 @@ from image_converter import ToOpenCV
 
 class ARsearch () :
   def __init__ (self):
+    self.cameraIndex = 0
     self.confirmed_target = 0
     self.status = 0
     self.currentState = (0,0,0,0)
@@ -39,7 +40,6 @@ class ARsearch () :
     self.vision = Vision_Processor ()
     self.autoPub = rospy.Publisher('/tum_ardrone/com', String)
     self.targetPub = rospy.Publisher('/ardrone/targetCoordinates', String)
-    self.subVideo = rospy.Subscriber('/ardrone/image_raw', Image, self.find_target)
     #self.relPosition = rospy.Subscriber('/ardrone/predictedPose', filter_state, self.get_state)
 
   #Moves the Ardrone to the given coordinates relative to where it has taken off
@@ -61,25 +61,38 @@ class ARsearch () :
 
   #Detects the red puck used as our tempory target
   def find_target(self, image):
-    image_cv = ToOpenCV(image)
-    frame = np.asarray(image_cv)
-    cv2.imshow("Window1", frame)
-    #print "Image Received!"
-    cv2.waitKey(25)
-    if self.vision.process_image(frame):
-      self.go_to(self.currentState[0], self.currentState[1], self.currentState[2], self.currentState[3])
-      self.confirmed_target += 1
+    if self.cameraIndex == 1:
+      self.cameraIndex = 0
+      image_cv = ToOpenCV(image)
+      frame = np.asarray(image_cv)
+      cv2.imshow("Window1", frame)
+      #print "Image Received!"
+      cv2.waitKey(25)
+
+      if self.vision.process_image(frame):
+        self.go_to(self.currentState[0], self.currentState[1], self.currentState[2], self.currentState[3])
+        self.confirmed_target += 1
+
+      else:
+        self.confirmed_target -= 1
+
+        if self.confirmed_target < 0:
+	  self.confirmed_target = 0
+          #self.fly_grid()
+
+      if self.confirmed_target >= 1:
+        print "TARGET FOUND " * 100
+        self.status = 1
+        #self.targetCoordinates = self.currentState
+        #self.targetPub.publish (str(self.targetCoordinates[0]) + " " + str(self.targetCoordinates[0]) + " " + str(self.targetCoordinates[0]) + " " + str(self.targetCoordinates[0]))
+	self.autoPub.publish("c clearCommands")
+        self.go_to (0,0,0,0)
+        self.autoPub.publish("c land")
+
     else:
-      self.confirmed_target -= 1
-      if self.confirmed_target < 0:
-	self.confirmed_target = 0
-        #self.fly_grid()
-    if self.confirmed_target > 200:
-      self.status = 1
-      self.targetCoordinates = self.currentState
-      self.targetPub.publish (str(self.targetCoordinates[0]) + " " + str(self.targetCoordinates[0]) + " " + str(self.targetCoordinates[0]) + " " + str(self.targetCoordinates[0]))
-      self.go_to (0,0,0,0)
-      self.autoPub.publish("c land")
+      self.cameraIndex = 1
+
+    self.toggle_cam(self.cameraIndex)
 
   #Flys in a set grid pattern until the target is found
   def fly_grid(self):
@@ -104,7 +117,9 @@ class ARsearch () :
     self.autoPub.publish("c goto 0 0 1 0")
     time.sleep(1)
     self.autoPub.publish("c goto 0 0 0 0")
-    time.sleep(3)
+    time.sleep(20)
+
+    self.subVideo = rospy.Subscriber('/ardrone/image_raw', Image, self.find_target)
 
     while (self.status == 0):
       self.autoPub.publish("c goto -0.5 -0.5 0 0")
@@ -119,7 +134,7 @@ class ARsearch () :
       self.autoPub.publish("c goto 0.3 0.5 0 0")
       self.autoPub.publish("c goto 0.5 0.5 0 0")
       self.autoPub.publish("c goto 0.5 -0.5 0 0")
-      time.sleep(10)
+      time.sleep(100)
   
   
 if __name__=="__main__":

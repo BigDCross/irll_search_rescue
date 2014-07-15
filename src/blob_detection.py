@@ -31,7 +31,7 @@ class Vision_Processor ():
         for i in self.outputs["Contours"]:
             area = cv.ContourArea (cv.fromarray (i))
             moment = cv2.moments (i)
-            if area > 5000:
+            if area > 1000:
                 self.outputs["Big_Contours"].append (i)
                 print area,
                 print " ",
