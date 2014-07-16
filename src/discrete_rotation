@@ -27,6 +27,8 @@ class TurtlebotDiscreteRotation:
 
         self.yaw = 0.0
 
+	self.compass = 0.0
+
     def deltaAngle (self, current, target):
         """
         DeltaAngle calculates the shortest angle between two angles
@@ -119,18 +121,21 @@ turtlebot = TurtlebotDiscreteRotation ()
 while True:
     # This is annoying to have to reference turtlebot.success. Will write a wrapper around
     # this wednesday.
+    print str(turtlebot.getDirection ())
     print "Right"
     turtlebot.rotate90Right ()
     while not turtlebot.success:
         turtlebot.checkRotation ()
     print "--------"
 
+    print str(turtlebot.getDirection ())
     print "Right"
     turtlebot.rotate90Right ()
     while not turtlebot.success:
         turtlebot.checkRotation ()
     print "--------"
 
+    print str(turtlebot.getDirection ())
     print "Left"
     turtlebot.rotate90Left ()
     while not turtlebot.success:

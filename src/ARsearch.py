@@ -58,7 +58,8 @@ class ARsearch () :
   #Index 1 = front camera. Index 2 = bottom camera.
   def toggle_cam(self, index):
     os.system("rosservice call /ardrone/setcamchannel " + str(index))
-
+    self.cameraIndex == index
+  
   #Detects the red puck used as our tempory target
   def find_target(self, image):
     if self.cameraIndex == 1:
@@ -126,29 +127,28 @@ class ARsearch () :
       self.autoPub.publish("c goto 0.0 0.0 0 0")
 
       time.sleep(3)
-      self.autoPub.publish("c goto 0.0 -0.5 0 0")
+      self.autoPub.publish("c goto 0.0 0.5 0 0")
       time.sleep(3)
-      self.autoPub.publish("c goto -0.2 -0.5 0 0")
+      self.autoPub.publish("c goto 0.2 0.5 0 0")
       time.sleep(3)
-      self.autoPub.publish("c goto -0.2 0.0 0 0")
+      self.autoPub.publish("c goto 0.2 0.0 0 0")
       time.sleep(3)
-      self.autoPub.publish("c goto -0.4 0.0 0 0")
+      self.autoPub.publish("c goto 0.4 0.0 0 0")
       time.sleep(3)
-      self.autoPub.publish("c goto -0.4 -0.5 0 0")
+      self.autoPub.publish("c goto 0.4 0.5 0 0")
       time.sleep(3)
-      self.autoPub.publish("c goto -0.6 -0.5 0 0")
+      self.autoPub.publish("c goto 0.6 0.5 0 0")
       time.sleep(3)
-      self.autoPub.publish("c goto -0.6 0.0 0 0")
+      self.autoPub.publish("c goto 0.6 0.0 0 0")
       time.sleep(3)
-      self.autoPub.publish("c goto -0.6 0.0 0 0")
+      self.autoPub.publish("c goto 0.6 0.0 0 0")
       time.sleep(3)
-      self.autoPub.publish("c goto -0.6 -0.5 0 0")
+      self.autoPub.publish("c goto 0.6 0.5 0 0")
       time.sleep(3)
-      self.autoPub.publish("c goto -0.8 -0.5 0 0")
+      self.autoPub.publish("c goto 0.8 0.5 0 0")
       time.sleep(3)
-      self.autoPub.publish("c goto -0.0 0.0 0 0")
-      time.sleep(100)
-  
+      self.autoPub.publish("c goto 0.0 0.0 0 0")
+      time.sleep(5) 
   
 if __name__=="__main__":
   search = ARsearch ()    
