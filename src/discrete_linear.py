@@ -19,10 +19,10 @@ from discrete_rotation import TurtlebotDiscreteRotation
 
 class TurtlebotDiscreteLinear ():
     def __init__(self):
-        rospy.init_node('turtle_discrete_linear')
+        #rospy.init_node('turtle_discrete_linear')
+	self.rotate = TurtlebotDiscreteRotation ()
         self.pub = rospy.Publisher('/mobile_base/commands/velocity', Twist)
         rospy.Subscriber('/gazebo/model_states', ModelStates, self.saveModelStates)
-	self.rotate = TurtlebotDiscreteRotation ()
 
 	self.target_position = (0,0,0)
 
@@ -33,6 +33,11 @@ class TurtlebotDiscreteLinear ():
 	self.turtlebot_position = None
 
 	self.last_turtlebot_position = None
+
+	print "Setup Finished"
+	print
+	print "--------------"
+	print
 
     def publishDrive (self, twist):
         self.pub.publish(twist)
@@ -53,9 +58,10 @@ class TurtlebotDiscreteLinear ():
     def set_destination(self,x,y):
 	z = 0
  	self.target_position = (x,y,z)
+	print "New Destination Set"
+	print
 
     def forward(self):
-	self.speed = 1
 	
 	#Forward in the +x direction
 	if self.rotate.get_direction() == 3.0:
@@ -81,6 +87,7 @@ class TurtlebotDiscreteLinear ():
 		x = math.floor(self.target_position[0])
 		y = math.floor(y)
 	
+	print (self.rotate.get_direction())
 	self.set_destination(x,y)
 
     def update_movement (self):
@@ -95,18 +102,18 @@ class TurtlebotDiscreteLinear ():
 
 			#if you're to the left of the puck, turn right
 			if self.turtlebot_position.x > self.target_position[0] or self.turtlebot_position.y > self.target_position[1]:
-				linear_twist.angular.z = -.1 * self.speed
-				linear_twist.linear.x = .05 * self.speed
+				linear_twist.angular.z = -.1 
+				linear_twist.linear.x = .05 
 
 			else:
 				#else, turn left
-				linear_twist.angular.z = .1 * self.speed
-				linear_twist.linear.x = .05 * self.speed	
+				linear_twist.angular.z = .1
+				linear_twist.linear.x = .05	
 
 		#else go straight
 		else:
 			linear_twist.angular.z = 0
-			linear_twist.linear.x = .05 * self.speed
+			linear_twist.linear.x = .05
 
 		self.publishDrive (linear_twist)
 
@@ -118,10 +125,26 @@ class TurtlebotDiscreteLinear ():
 
 
 if __name__=="__main__":
-    linear = SearchAndRescue ()
-    rotation = TurtlebotDiscreteRotation ()
-    sleep(2)
-    linear.forward()
-    
-    while not 
-    rospy.spin()        
+	#print "GAP"
+	#linear = TurtlebotDiscreteLinear ()
+	#print "HEIEHOIEH"
+	rotation = TurtlebotDiscreteRotation ()
+	sleep(3)
+
+	print "Turning Right!"
+	rotation.rotate90Right ()
+	while not rotation.rotation_success:
+       		rotation.checkRotation ()
+		print "Turning!"
+	
+ 	#print "It's Moving Forward!"
+	#linear.forward()
+	#while not linear.success :
+	#	linear.success = 0
+
+	print "Turning LEft"
+	rotation.rotate90Left ()
+	while not rotation.rotation_success:
+       		rotation.checkRotation ()
+
+	rospy.spin()        
