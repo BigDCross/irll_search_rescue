@@ -20,7 +20,7 @@ class TurtlebotDiscreteRotation:
 
         self.desired_orientation = 0
 
-        self.success = 0
+        self.rotation_success = 0
 
         # PID Tuning Variable. Could be changed but keep the sign positive!
         self.P = 0.004
@@ -115,29 +115,3 @@ class TurtlebotDiscreteRotation:
     def getDirection (self):
         # Check if this still works
         return self.compass
-
-turtlebot = TurtlebotDiscreteRotation ()
-
-while True:
-    # This is annoying to have to reference turtlebot.success. Will write a wrapper around
-    # this wednesday.
-    print str(turtlebot.getDirection ())
-    print "Right"
-    turtlebot.rotate90Right ()
-    while not turtlebot.success:
-        turtlebot.checkRotation ()
-    print "--------"
-
-    print str(turtlebot.getDirection ())
-    print "Right"
-    turtlebot.rotate90Right ()
-    while not turtlebot.success:
-        turtlebot.checkRotation ()
-    print "--------"
-
-    print str(turtlebot.getDirection ())
-    print "Left"
-    turtlebot.rotate90Left ()
-    while not turtlebot.success:
-        turtlebot.checkRotation ()
-    print "--------"

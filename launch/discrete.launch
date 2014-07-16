@@ -1,4 +1,4 @@
 <launch>
-  <node pkg="irll_search_rescue" type="discrete_rotation" name="turtlebot_discrete_rotation"  output="screen">
+  <node pkg="irll_search_rescue" type="turtlebot_discrete_movement.py" name="turtlebot_discrete_rotation"  output="screen">
   </node>
 </launch>
