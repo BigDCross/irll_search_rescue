@@ -112,6 +112,6 @@ class TurtlebotDiscreteRotation:
 
         #self.printModelStates ()
 
-    def getDirection (self):
+    def get_direction (self):
         # Check if this still works
         return self.compass
