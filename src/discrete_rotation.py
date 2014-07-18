@@ -20,7 +20,7 @@ class TurtlebotDiscreteRotation:
 
         self.desired_orientation = 0
 
-        self.rotation_success = 0
+        self.success = 0
 
         # PID Tuning Variable. Could be changed but keep the sign positive!
         self.P = 0.004
@@ -49,13 +49,13 @@ class TurtlebotDiscreteRotation:
         self.pub.publish(twist)
 
     def rotate90Right (self):
-        self.rotation_success = 0
+        self.success = 0
 
         self.desired_orientation -= 90
         self.desired_orientation = self.desired_orientation % 360
 
     def rotate90Left (self):
-        self.rotation_success = 0
+        self.success = 0
 
         self.desired_orientation += 90
         self.desired_orientation = self.desired_orientation % 360
@@ -69,9 +69,9 @@ class TurtlebotDiscreteRotation:
         if abs (error) > 10:
             twist.angular.z = self.P * error
             self.publishDrive (twist)
-            self.rotation_success = 0
+            self.success = 0
         else:
-            self.rotation_success = 1
+            self.success = 1
 
         # Manual update at 5 hz
         sleep (.2)

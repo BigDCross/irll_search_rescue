@@ -61,8 +61,6 @@ class TurtlebotDiscreteLinear ():
 
         if self.target_position == None:
             self.target_position = (0, 0, 0)
-
-        self.update_movement ()
  
     def set_destination(self,x,y):
         z = 0
@@ -71,12 +69,13 @@ class TurtlebotDiscreteLinear ():
         print
 
     def forward(self):
+        self.success = 0
         
         #Forward in the +x direction
         if self.rotate.get_direction() == 3.0:
             x = self.target_position[0] + self.cell_length
             #x = math.ceil(x)
-                y = self.target_position[1]
+            y = self.target_position[1]
 
         #Foward in the +y direction
         elif self.rotate.get_direction() == 0.0:
@@ -140,14 +139,14 @@ class TurtlebotDiscreteLinear ():
                     linear_twist.linear.x = .05
 
                 # -y direction
-            elif self.rotate.get_direction () == 2.0: #and abs(self.turtlebot_position.x - self.target_position[0]) > .1:
+            elif self.rotate.get_direction () == 2.0 and abs(self.turtlebot_position.x - self.target_position[0]) > .05:
                 print "-y direction"
                 if self.turtlebot_position.x > self.target_position[0]:
+                    linear_twist.angular.z = -0.035 #positive is left?
                     linear_twist.linear.x = .05
                     print "111"
-                    linear_twist.angular.z = 0.035 #positive is left?
                 elif self.turtlebot_position.x < self.target_position[0]:
-                    #linear_twist.angular.z = 0.035
+                    linear_twist.angular.z = 0.035
                     linear_twist.linear.x = .05
                     print "222"
             else:
@@ -162,6 +161,7 @@ class TurtlebotDiscreteLinear ():
 
         print "Current Position =  X: " + str(self.turtlebot_position.x) + " Y: " + str(self.turtlebot_position.y)
         print "Target Position = X: " + str(self.target_position[0]) + " Y: " + str(self.target_position[1])
+        sleep (0.2)
 
 '''
 if __name__=="__main__":

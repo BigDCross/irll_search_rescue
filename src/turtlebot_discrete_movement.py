@@ -9,38 +9,47 @@ from time import sleep
 rotate = TurtlebotDiscreteRotation ()
 linear = TurtlebotDiscreteLinear ()
 def getTargetPose ():
-	return linear.getTargetPose ()
+    return linear.getTargetPose ()
 
 def getTurtlePose ():
-	return linear.getTurtlePose ()
+    return linear.getTurtlePose ()
 
 def forward ():
-	print "Going Forward"
-	linear.forward()
-	while not linear.success:
-		linear.success = 0
-	sleep(5)
+    print "Going Forward"
+    linear.forward()
+    while not linear.success:
+        linear.update_movement ()
 
 def turnRight ():
     print "Turning Right"
     rotate.rotate90Right ()
-    while not rotate.rotation_success:
+    while not rotate.success:
         rotate.checkRotation ()
-    sleep(5)
-	
+    
 def turnLeft ():
     print "Turning Left"
     rotate.rotate90Left ()
-    while not rotate.rotation_success:
+    while not rotate.success:
         rotate.checkRotation ()
-    sleep(5)
 
 def main ():
     while not rospy.is_shutdown ():
-        #turnLeft ()
-	forward ()
+        forward ()
+        turnRight ()
+        forward ()
+        turnRight ()
+        forward ()
+        turnRight ()
+        forward ()
+        turnRight ()
+
+        forward ()
         turnLeft ()
-	forward ()
+        forward ()
+        turnLeft ()
+        forward ()
+        turnLeft ()
+        forward ()
         turnLeft ()
 
 if __name__=="__main__":
